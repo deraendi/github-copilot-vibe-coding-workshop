@@ -1,0 +1,334 @@
+openapi: 3.0.1
+info:
+  title: Simple Social Media Application API
+  version: 1.0.0
+  description: API for a basic social networking service with posts, comments, and likes.
+servers:
+  - url: http://localhost:8080/api
+paths:
+  /posts:
+    get:
+      summary: List all posts
+      responses:
+        '200':
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        '500':
+          $ref: '#/components/responses/Error'
+    post:
+      summary: Create a new post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /posts/{postId}:
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a single post
+      responses:
+        '200':
+          description: Post details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+    patch:
+      summary: Update a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUpdate'
+      responses:
+        '200':
+          description: Post updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+    delete:
+      summary: Delete a post
+      responses:
+        '204':
+          description: Post deleted
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /posts/{postId}/comments:
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: List comments for a post
+      responses:
+        '200':
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+    post:
+      summary: Create a comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /posts/{postId}/comments/{commentId}:
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a specific comment
+      responses:
+        '200':
+          description: Comment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+    patch:
+      summary: Update a comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentUpdate'
+      responses:
+        '200':
+          description: Comment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+    delete:
+      summary: Delete a comment
+      responses:
+        '204':
+          description: Comment deleted
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /posts/{postId}/likes:
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Like a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LikeCreate'
+      responses:
+        '201':
+          description: Like added
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+    delete:
+      summary: Unlike a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LikeDelete'
+      responses:
+        '204':
+          description: Like removed
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        likes:
+          type: integer
+        comments:
+          type: integer
+    PostCreate:
+      type: object
+      required:
+        - username
+        - content
+      properties:
+        username:
+          type: string
+        content:
+          type: string
+    PostUpdate:
+      type: object
+      required:
+        - username
+        - content
+      properties:
+        username:
+          type: string
+        content:
+          type: string
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+        postId:
+          type: string
+        username:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CommentCreate:
+      type: object
+      required:
+        - username
+        - content
+      properties:
+        username:
+          type: string
+        content:
+          type: string
+    CommentUpdate:
+      type: object
+      required:
+        - username
+        - content
+      properties:
+        username:
+          type: string
+        content:
+          type: string
+    LikeCreate:
+      type: object
+      required:
+        - username
+      properties:
+        username:
+          type: string
+    LikeDelete:
+      type: object
+      required:
+        - username
+      properties:
+        username:
+          type: string
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+  responses:
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
